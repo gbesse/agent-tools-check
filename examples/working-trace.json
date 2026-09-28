@@ -1,0 +1,62 @@
+{
+  "client_request": {
+    "tools": [
+      {
+        "type": "namespace",
+        "name": "collaboration",
+        "tools": [
+          {
+            "type": "function",
+            "name": "spawn_agent"
+          }
+        ]
+      }
+    ],
+    "input": [
+      {
+        "type": "agent_message",
+        "recipient": "/root/worker",
+        "content": [
+          {
+            "type": "input_text",
+            "text": "Reply PONG-W"
+          }
+        ]
+      }
+    ]
+  },
+  "upstream_request": {
+    "tools": [
+      {
+        "type": "function",
+        "name": "collaboration__spawn_agent"
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "Reply PONG-W"
+      }
+    ]
+  },
+  "upstream_response": {
+    "output": [
+      {
+        "type": "function_call",
+        "name": "collaboration__spawn_agent",
+        "arguments": "{\"message\":\"Reply PONG-W\"}"
+      }
+    ]
+  },
+  "client_response": {
+    "output": [
+      {
+        "type": "function_call",
+        "name": "spawn_agent",
+        "namespace": "collaboration",
+        "arguments": "{\"message\":\"Reply PONG-W\"}",
+        "encrypted_function_args": []
+      }
+    ]
+  }
+}
