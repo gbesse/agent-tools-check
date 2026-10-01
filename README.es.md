@@ -1,16 +1,23 @@
 # Agent Tools Check
 
-**¿Perdió tu agente de IA sus herramientas o su tarea al cambiar de gateway?** Compara las cuatro etapas JSON de una llamada. La herramienta indica si la gateway descartó una herramienta con espacio de nombres, no restituyó su llamada, cambió los argumentos o perdió el mensaje del subagente.
+**¿Tu servidor MCP está conectado, pero el agente no ve sus herramientas?** Compara los catálogos para encontrar el primer límite donde desaparecen. Un segundo comando comprueba si una gateway conservó las llamadas y los mensajes de tarea.
 
 [Français](README.fr.md) · [English](README.md) · Español
+
+## Proyectos relacionados
+
+- [Codex #49758](https://github.com/openai/codex/issues/49758) describe un servidor MCP READY cuyas herramientas no ve el agente. El nuevo diagnóstico distingue la ausencia confirmada de una búsqueda diferida no comprobada.
+- [Magpie #404](https://github.com/yetone/magpie/issues/404) describe funciones `namespace` eliminadas antes de llegar a Grok; el ejemplo reconstruido comprueba ese punto. [Magpie #130](https://github.com/yetone/magpie/issues/130) expone un problema cercano.
+- [LLMConform](https://github.com/aitk-org/LLMConform) cubre ampliamente las gateways. Este repositorio compara una captura pequeña de herramientas. Estos enlaces no implican integración ni afiliación.
 
 ## Ver el problema en 10 segundos
 
 ```sh
+python3 doctor.py demo --lang es
 python3 check.py demo --lang es
 ```
 
-La demostración muestra tres comprobaciones que fallan con una gateway ficticia y luego el mismo intercambio correcto. No requiere modelo, cuenta, clave API ni red. Las pruebas de protocolo son **sintéticas**: no son una prueba real de Magpie ni de otra gateway.
+La primera demostración muestra una herramienta ausente, una búsqueda diferida inconclusa y una herramienta visible. La segunda muestra tres comprobaciones fallidas en una gateway ficticia y luego el intercambio correcto. No requiere modelo, cuenta, clave API ni red. Los ejemplos son **sintéticos o reconstruidos**: no son una prueba real de Codex, Magpie u otra gateway.
 
 ## Comprobar un intercambio capturado
 
@@ -23,11 +30,16 @@ Códigos de salida: `0` conservado; `2` capacidad perdida; `1` traza no válida.
 
 **Límite actual:** no hay captura automática ni integración con Magpie. La herramienta funciona sin conexión sobre tus trazas; la demostración sintética no prueba que una gateway real funcione. El contrato Responses cubierto es limitado.
 
-## Proyectos relacionados
+## Diagnosticar una herramienta conectada pero invisible
 
-- [Magpie #130](https://github.com/yetone/magpie/issues/130) describe la desaparición de herramientas Codex con espacio de nombres al pasar por Magpie. Su forma concreta de `spawn_agent` guía la comprobación.
-- [Magpie #141](https://github.com/yetone/magpie/issues/141) describe un subagente MultiAgentV2 que no recibe la tarea. Los casos `agent_message` y argumentos en claro guían la comprobación.
-- [LLMConform](https://github.com/aitk-org/LLMConform) cubre ampliamente la compatibilidad de gateways. Agent Tools Check se centra en las cuatro etapas de una delegación. No se afirma integración ni afiliación.
+```sh
+python3 doctor.py demo --lang es
+python3 doctor.py scan examples/magpie-namespaced-missing.json --lang es --json
+```
+
+`doctor.py` compara la respuesta MCP `tools/list` o el catálogo de una gateway con las herramientas visibles para el agente. Lee respuestas brutas `tools/list` y herramientas Responses `namespace`; use `agent_names` para declarar explícitamente nombres cambiados o con prefijo. Si existe `tool_search` pero no se capturó su resultado, devuelve **inconcluso** en vez de declarar ausente la herramienta. Códigos: `0` visible, `2` ausente, `3` inconcluso, `1` entrada no válida. Consulte el [formato y la guía de expurgación](docs/doctor-format.md).
+
+Los ejemplos reconstruyen solo los nombres y estados descritos en las issues enlazadas: **no son capturas de sesión ni integraciones reales con Codex o Magpie**. El diagnóstico sitúa la ausencia en los catálogos proporcionados; no identifica el fallo del cliente ni prueba que la invocación funcione. [Magpie #141](https://github.com/yetone/magpie/issues/141) sigue siendo el caso independiente de mensaje de tarea cubierto por `check.py`.
 
 ## Pruebas
 
