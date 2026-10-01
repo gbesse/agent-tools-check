@@ -1,0 +1,13 @@
+{
+  "origin": {
+    "kind": "mcp_tools_list",
+    "status": "ready",
+    "tools": {"result": {"tools": [
+      {"name": "elementor-get-page-structure"},
+      {"name": "elementor-read-resource"}
+    ]}}
+  },
+  "agent": {
+    "tools": [{"type": "function", "name": "tool_search"}]
+  }
+}

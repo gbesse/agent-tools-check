@@ -1,0 +1,4 @@
+{
+  "origin": {"tools": {"result": {"tools": [{"name": "find_page"}]}}},
+  "agent": {"tools": [{"type": "function", "name": "find_page"}]}
+}

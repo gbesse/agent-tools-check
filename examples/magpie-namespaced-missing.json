@@ -1,0 +1,15 @@
+{
+  "origin": {
+    "kind": "client_request",
+    "tools": [
+      {"type": "namespace", "name": "collaboration", "tools": [
+        {"type": "function", "name": "spawn_agent"},
+        {"type": "function", "name": "wait_agent"}
+      ]}
+    ]
+  },
+  "agent": {
+    "tools": [{"type": "function", "name": "tool_search"}],
+    "search": {"performed": true, "results": []}
+  }
+}
