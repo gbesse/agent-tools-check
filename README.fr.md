@@ -29,6 +29,10 @@ python3 doctor.py compare examples/working-visibility.json examples/delegated-mi
 
 L'exemple synthétique signale `find_page` comme visible seulement en session directe. Codes de sortie : `2` perte confirmée, `3` recherche différée non capturée, `0` aucune perte confirmée, `1` entrée invalide. La commande lit deux catalogues capturés localement. Elle ne collecte pas une tâche Codex réelle et n'identifie pas le défaut de l'hôte. [Codex #50201](https://github.com/openai/codex/issues/50201) est le rapport voisin.
 
+## Comparer les captures avec outil renommé
+
+Exécutez `python3 doctor.py compare examples/renamed-direct.json examples/renamed-delegated.json --lang fr`. La capture directe synthétique associe explicitement `find_page` à `spaces__find_page` ; la capture déléguée ne contient aucun des deux noms. Le résultat confirme une perte de visibilité, sans en attribuer la cause à l’hôte.
+
 ## Vérifier un échange capturé
 
 ```sh

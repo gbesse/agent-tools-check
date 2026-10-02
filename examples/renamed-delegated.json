@@ -1,0 +1,5 @@
+{
+  "origin": {"tools": {"result": {"tools": [{"name": "find_page"}]}}},
+  "agent": {"tools": [{"type": "function", "name": "unrelated_tool"}]},
+  "agent_names": {"find_page": ["spaces__find_page"]}
+}

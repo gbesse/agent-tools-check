@@ -29,6 +29,10 @@ python3 doctor.py compare examples/working-visibility.json examples/delegated-mi
 
 The synthetic example reports `find_page` visible only in the direct session. Exit codes: `2` confirmed loss, `3` deferred search not captured, `0` no confirmed loss, `1` invalid input. The command reads two local captured catalogs. It does not collect a live Codex task or identify the host defect. [Codex #50201](https://github.com/openai/codex/issues/50201) is the related direct/delegated report.
 
+## Compare renamed tool captures
+
+Run `python3 doctor.py compare examples/renamed-direct.json examples/renamed-delegated.json --lang en`. The synthetic direct capture explicitly maps `find_page` to `spaces__find_page`; the delegated capture lacks both names. The result is a confirmed visibility loss, not a claim about why a host omitted the tool.
+
 ## Check a captured exchange
 
 ```sh

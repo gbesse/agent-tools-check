@@ -12,6 +12,10 @@
 - [Magpie #404](https://github.com/yetone/magpie/issues/404) describe funciones `namespace` eliminadas antes de llegar a Grok; el ejemplo reconstruido comprueba ese punto. [Magpie #130](https://github.com/yetone/magpie/issues/130) expone un problema cercano.
 - [LLMConform](https://github.com/aitk-org/LLMConform) cubre ampliamente las gateways. Este repositorio compara una captura pequeña de herramientas. Estos enlaces no implican integración ni afiliación.
 
+## Comparar capturas con una herramienta renombrada
+
+Ejecute `python3 doctor.py compare examples/renamed-direct.json examples/renamed-delegated.json --lang es`. La captura directa sintética asocia explícitamente `find_page` con `spaces__find_page`; en la captura delegada faltan ambos nombres. El resultado confirma una pérdida de visibilidad sin atribuir su causa al host.
+
 ## Ver el problema en 10 segundos
 
 ```sh
