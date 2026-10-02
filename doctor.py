@@ -15,6 +15,9 @@ LABELS = {
         "invalid": "Invalid diagnostic: {error}",
         "names": "Tools: {names}",
         "boundary": "Boundary: after tool discovery, before agent exposure.",
+        "compare": "Visible in direct session, missing in delegated task: {names}",
+        "compare_none": "No confirmed tool loss between these two captured sessions.",
+        "compare_uncertain": "The delegated capture is inconclusive because a deferred tool search was not captured.",
     },
     "fr": {
         "visible": "VISIBLES : {visible}/{total} outils annoncés trouvés côté agent.",
@@ -23,6 +26,9 @@ LABELS = {
         "invalid": "Diagnostic invalide : {error}",
         "names": "Outils : {names}",
         "boundary": "Frontière : après la découverte des outils, avant leur exposition à l'agent.",
+        "compare": "Visibles en session directe, absents de la tâche déléguée : {names}",
+        "compare_none": "Aucune perte d'outil confirmée entre ces deux captures.",
+        "compare_uncertain": "La capture déléguée reste indéterminée : le résultat d'une recherche différée manque.",
     },
     "es": {
         "visible": "VISIBLES: {visible}/{total} herramientas anunciadas aparecen ante el agente.",
@@ -31,6 +37,9 @@ LABELS = {
         "invalid": "Diagnóstico no válido: {error}",
         "names": "Herramientas: {names}",
         "boundary": "Límite: después del descubrimiento de herramientas, antes de mostrarlas al agente.",
+        "compare": "Visibles en la sesión directa, ausentes en la tarea delegada: {names}",
+        "compare_none": "No se confirma pérdida de herramientas entre estas dos capturas.",
+        "compare_uncertain": "La captura delegada es inconclusa: falta el resultado de una búsqueda diferida.",
     },
 }
 NOTES = {
@@ -39,9 +48,9 @@ NOTES = {
     "es": "Esta comprobación compara catálogos de herramientas capturados; no prueba que una llamada funcione ni identifica la causa en el cliente.",
 }
 ERRORS = {
-    "en": {"root": "root must be an object", "stages": "origin and agent must be objects", "required": "origin.tools and agent.tools are required", "agent_tools": "agent.tools must be a captured list or object", "empty": "origin.tools contains no named tools", "search": "agent.search must be an object", "aliases": "agent_names must be an object mapping advertised tools to non-empty name arrays", "path": "scan requires a diagnostic JSON file"},
-    "fr": {"root": "la racine doit être un objet", "stages": "origin et agent doivent être des objets", "required": "origin.tools et agent.tools sont requis", "agent_tools": "agent.tools doit être une liste ou un objet capturé", "empty": "origin.tools ne contient aucun outil nommé", "search": "agent.search doit être un objet", "aliases": "agent_names doit associer des outils annoncés à des listes non vides de noms", "path": "scan exige un fichier JSON de diagnostic"},
-    "es": {"root": "la raíz debe ser un objeto", "stages": "origin y agent deben ser objetos", "required": "se requieren origin.tools y agent.tools", "agent_tools": "agent.tools debe ser una lista u objeto capturado", "empty": "origin.tools no contiene herramientas con nombre", "search": "agent.search debe ser un objeto", "aliases": "agent_names debe asociar herramientas anunciadas con listas no vacías de nombres", "path": "scan requiere un archivo JSON de diagnóstico"},
+    "en": {"root": "root must be an object", "stages": "origin and agent must be objects", "required": "origin.tools and agent.tools are required", "agent_tools": "agent.tools must be a captured list or object", "empty": "origin.tools contains no named tools", "search": "agent.search must be an object", "aliases": "agent_names must be an object mapping advertised tools to non-empty name arrays", "path": "scan requires a diagnostic JSON file", "compare_path": "compare requires direct and delegated JSON files"},
+    "fr": {"root": "la racine doit être un objet", "stages": "origin et agent doivent être des objets", "required": "origin.tools et agent.tools sont requis", "agent_tools": "agent.tools doit être une liste ou un objet capturé", "empty": "origin.tools ne contient aucun outil nommé", "search": "agent.search doit être un objet", "aliases": "agent_names doit associer des outils annoncés à des listes non vides de noms", "path": "scan exige un fichier JSON de diagnostic", "compare_path": "compare exige les fichiers JSON direct et délégué"},
+    "es": {"root": "la raíz debe ser un objeto", "stages": "origin y agent deben ser objetos", "required": "se requieren origin.tools y agent.tools", "agent_tools": "agent.tools debe ser una lista u objeto capturado", "empty": "origin.tools no contiene herramientas con nombre", "search": "agent.search debe ser un objeto", "aliases": "agent_names debe asociar herramientas anunciadas con listas no vacías de nombres", "path": "scan requiere un archivo JSON de diagnóstico", "compare_path": "compare requiere los archivos JSON directo y delegado"},
 }
 
 
@@ -108,9 +117,26 @@ def diagnose(document, lang="en"):
         "boundary": "after_origin_discovery" if status == "missing" else None,
         "advertised": len(advertised),
         "visible": len(visible),
+        "visible_names": visible,
         "missing": absent if status == "missing" else [],
         "unverified": absent if status == "inconclusive" else [],
         "search_performed": bool(search and search.get("performed") is True),
+        "note": NOTES[lang],
+    }
+
+
+def compare_sessions(direct_document, delegated_document, lang="en"):
+    """Compare captured host surfaces; never infer why a host omitted a tool."""
+    direct = diagnose(direct_document, lang)
+    delegated = diagnose(delegated_document, lang)
+    lost = sorted(set(direct["visible_names"]) - set(delegated["visible_names"]))
+    uncertain = delegated["status"] == "inconclusive"
+    return {
+        "status": "inconclusive" if uncertain else "lost" if lost else "no_confirmed_loss",
+        "visible_only_direct": [] if uncertain else lost,
+        "unverified": lost if uncertain else [],
+        "direct": direct,
+        "delegated": delegated,
         "note": NOTES[lang],
     }
 
@@ -134,13 +160,32 @@ def render(result, lang):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("demo", "scan"))
+    parser.add_argument("command", choices=("demo", "scan", "compare"))
     parser.add_argument("path", nargs="?", type=Path)
+    parser.add_argument("second_path", nargs="?", type=Path)
     parser.add_argument("--lang", choices=LABELS, default="en")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args(argv)
     if args.command == "scan" and args.path is None:
         parser.error(ERRORS[args.lang]["path"])
+    if args.command == "compare":
+        if args.path is None or args.second_path is None:
+            parser.error(ERRORS[args.lang]["compare_path"])
+        try:
+            result = compare_sessions(json.loads(args.path.read_text(encoding="utf-8")),
+                                      json.loads(args.second_path.read_text(encoding="utf-8")), args.lang)
+        except (OSError, json.JSONDecodeError, ValueError) as error:
+            print(LABELS[args.lang]["invalid"].format(error=error), file=sys.stderr)
+            return 1
+        if args.json:
+            print(json.dumps(result, ensure_ascii=False))
+        elif result["status"] == "inconclusive":
+            print(LABELS[args.lang]["compare_uncertain"])
+        elif result["status"] == "lost":
+            print(LABELS[args.lang]["compare"].format(names=", ".join(result["visible_only_direct"])))
+        else:
+            print(LABELS[args.lang]["compare_none"])
+        return {"lost": 2, "inconclusive": 3, "no_confirmed_loss": 0}[result["status"]]
     paths = ([Path(__file__).parent / "examples" / name for name in
               ("magpie-namespaced-missing.json", "codex-ready-unverified.json", "working-visibility.json")]
              if args.command == "demo" else [args.path])

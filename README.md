@@ -7,6 +7,8 @@
 ## Related projects
 
 - [Codex #49758](https://github.com/openai/codex/issues/49758) reports an MCP server at READY whose tools are unavailable to the agent. The new doctor distinguishes a confirmed absence from an untested deferred search.
+- [Codex #50201](https://github.com/openai/codex/issues/50201) reports a configured STDIO server visible directly but missing in a delegated local task; `compare` checks two supplied captures of that boundary.
+- [MCP Extensions #28](https://github.com/openai/mcp-extensions/issues/28) and [#29](https://github.com/openai/mcp-extensions/issues/29) report a fullscreen mode mismatch and a listed entrypoint without an observed `tools/call`. `entrypoint.py` checks supplied host traces, without a live host integration.
 - [Magpie #404](https://github.com/yetone/magpie/issues/404) describes `namespace` functions dropped before Grok sees them; our reconstructed example checks that boundary. [Magpie #130](https://github.com/yetone/magpie/issues/130) reports a related gateway problem.
 - [LLMConform](https://github.com/aitk-org/LLMConform) covers broad gateway compatibility. This repository compares a small, captured tool surface. These links do not imply integration or affiliation.
 
@@ -19,6 +21,14 @@ python3 check.py demo
 
 The first demo shows a missing tool, an inconclusive deferred search and a visible tool. The second shows a broken gateway failing three checks, then passing after repair. Both run without a model, account, API key or network. They use **synthetic or reconstructed protocol fixtures**; neither is a live test of Codex, Magpie or another gateway.
 
+## Compare direct and delegated tasks
+
+```sh
+python3 doctor.py compare examples/working-visibility.json examples/delegated-missing.json --lang en
+```
+
+The synthetic example reports `find_page` visible only in the direct session. Exit codes: `2` confirmed loss, `3` deferred search not captured, `0` no confirmed loss, `1` invalid input. The command reads two local captured catalogs. It does not collect a live Codex task or identify the host defect. [Codex #50201](https://github.com/openai/codex/issues/50201) is the related direct/delegated report.
+
 ## Check a captured exchange
 
 ```sh
@@ -29,6 +39,15 @@ python3 check.py check examples/broken-trace.json --json
 Exit codes: `0` preserved, `2` lost capability, `1` invalid trace. The JSON file must contain `client_request`, `upstream_request`, `upstream_response` and `client_response`. These are the four surfaces to capture while debugging your own gateway. See [trace format](docs/trace-format.md). The checker accepts a namespaced tool forwarded as `namespace__name`, tests that the returned function call carries the original namespace, checks that plaintext arguments carry `encrypted_function_args: []`, and confirms that `agent_message` text reached the upstream request.
 
 **Current limit:** there is no automatic capture or Magpie integration. This is an offline checker for traces you provide; a passing synthetic demo does not establish that a live gateway works. It checks a narrow Responses-style contract, not all provider protocols or tool semantics.
+
+## Check a plugin entrypoint trace
+
+```sh
+python3 entrypoint.py demo --lang en
+python3 entrypoint.py check fixtures/host-trace.json --lang en
+```
+
+The capture format contains `declared_modes`, `host_modes`, `entrypoint_listed`, `trace_complete`, and `call_observed`. The checker distinguishes a confirmed mismatch from incomplete evidence. The fixture is synthetic. It does not open a ChatGPT plugin or diagnose the host root cause.
 
 ## Diagnose a tool that is connected but invisible
 
