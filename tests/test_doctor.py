@@ -2,7 +2,7 @@ import json
 import unittest
 from pathlib import Path
 
-from doctor import diagnose
+from doctor import compare_sessions, diagnose
 
 EXAMPLES = Path(__file__).parents[1] / "examples"
 
@@ -51,3 +51,13 @@ class DoctorTests(unittest.TestCase):
         trace["agent"]["search"] = {"performed": True}
         with self.assertRaises(ValueError):
             diagnose(trace)
+
+    def test_direct_to_delegated_loss_is_confirmed(self):
+        result = compare_sessions(self.fixture("working-visibility.json"), self.fixture("delegated-missing.json"))
+        self.assertEqual(result["status"], "lost")
+        self.assertEqual(result["visible_only_direct"], ["find_page"])
+
+    def test_deferred_search_prevents_false_loss_claim(self):
+        result = compare_sessions(self.fixture("working-visibility.json"), self.fixture("codex-ready-unverified.json"))
+        self.assertEqual(result["status"], "inconclusive")
+        self.assertEqual(result["visible_only_direct"], [])
