@@ -1,5 +1,19 @@
 # Agent Tools Check
 
+## Nouveau : retrouver les serveurs MCP égarés après une synchronisation Pi
+
+`python3 pi_mcp.py pi-demo --lang fr` montre deux serveurs déplacés du `mcp.json` natif de Pi vers un fichier d’adaptateur que la configuration active ne lit pas. La démo réussie sort avec le code 0. Comparez des **copies** avant et après synchronisation :
+
+```sh
+python3 pi_mcp.py pi-compare AVANT APRES --pi-version 1.0.3 --lang fr
+```
+
+Si vous n’avez que le dossier actuel, lancez `python3 pi_mcp.py pi-scan DOSSIER_AGENT --pi-version 1.0.3 --lang fr`. Le code 2 indique alors un serveur **supposé** illisible d’après son emplacement ; une capture avant synchronisation est nécessaire pour confirmer une perte.
+
+Chaque dossier contient les fichiers disponibles `settings.json`, `mcp.json`, `mcp-adapter.json` et, le cas échéant, `npm/node_modules/pi-mcp-adapter/`. Le contrôle lit JSON ou JSONC, affiche seulement les **noms** des serveurs et ne modifie ni n’affiche commandes, URL, en-têtes ou secrets. Codes de sortie : 0 aucune perte confirmée, 2 serveurs absents du chemin natif attendu, 3 lecteur indéterminé, 1 capture invalide. Pour Pi 0.99+, il suppose le MCP natif sauf si l’adaptateur est déclaré dans les réglages ou présent sous `extensions/` ; un ancien répertoire npm seul ne prouve pas son chargement. Un adaptateur chargé ou une ancienne version restent indéterminés car les versions d’adaptateur diffèrent. Ce contrôle porte sur les fichiers, pas sur la visibilité réelle des outils ; utilisez `doctor.py compare` avec des catalogues capturés pour cette autre frontière.
+
+**Projets voisins :** [Magpie #1097](https://github.com/yetone/magpie/issues/1097) décrit cette migration de configuration et une détection d’adaptateur périmé confirmée par le mainteneur ; [le MCP natif de Pi](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/mcp.md) fournit le lecteur. Cet outil indépendant ne modifie aucun des deux projets.
+
 **Votre serveur MCP est connecté, mais votre agent ne voit pas ses outils ?** Comparez les catalogues pour trouver la première frontière où ils disparaissent. Une seconde commande vérifie si une gateway conserve les appels et messages de tâche.
 
 Français · [English](README.md) · [Español](README.es.md)

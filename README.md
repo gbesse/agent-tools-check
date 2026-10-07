@@ -1,5 +1,19 @@
 # Agent Tools Check
 
+## New: find MCP servers stranded after a Pi sync
+
+`python3 pi_mcp.py pi-demo --lang en` shows two servers moving from Pi's native `mcp.json` into an adapter file that the active Pi setup does not read. A successful demo exits 0. Compare **copies** of your configuration before and after a sync:
+
+```sh
+python3 pi_mcp.py pi-compare BEFORE_DIR AFTER_DIR --pi-version 1.0.3 --lang en
+```
+
+If you have only the current directory, run `python3 pi_mcp.py pi-scan AGENT_DIR --pi-version 1.0.3 --lang en`. Exit 2 then means a server is **suspected** to be unread from its file placement; a before snapshot is required to confirm a loss.
+
+Each directory contains the available `settings.json`, `mcp.json`, `mcp-adapter.json` and, if present, `npm/node_modules/pi-mcp-adapter/`. The checker reads JSON or JSONC, reports server **names only**, and never edits files or prints commands, URLs, headers, or credentials. Exit codes: 0 no confirmed loss, 2 servers no longer on the expected native path, 3 reader unknown, 1 invalid capture. It assumes Pi 0.99+ uses native MCP unless the adapter is declared in settings or present under `extensions/`; a leftover npm directory alone is not proof it is loaded. Loaded adapter and legacy configurations remain inconclusive because adapter versions differ. This checks file placement, not actual runtime tool visibility; use `doctor.py compare` with captured tool catalogs for that separate boundary.
+
+**Related projects:** [Magpie #1097](https://github.com/yetone/magpie/issues/1097) reports this configuration migration and a maintainer-confirmed stale-adapter detection path; [Pi's native MCP support](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/mcp.md) supplies the reader. This tool is independent and does not modify either project.
+
 **Your MCP server is connected, but your agent cannot see its tools?** Compare the tool catalogs to find the first missing boundary. A second command checks whether a model gateway preserved tool calls and task messages.
 
 [Français](README.fr.md) · English · [Español](README.es.md)

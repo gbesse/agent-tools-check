@@ -1,5 +1,19 @@
 # Agent Tools Check
 
+## Nuevo: encontrar servidores MCP extraviados tras sincronizar Pi
+
+`python3 pi_mcp.py pi-demo --lang es` muestra dos servidores trasladados del `mcp.json` nativo de Pi a un archivo del adaptador que la configuración activa no lee. La demo correcta sale con código 0. Compare **copias** anteriores y posteriores a la sincronización:
+
+```sh
+python3 pi_mcp.py pi-compare ANTES DESPUES --pi-version 1.0.3 --lang es
+```
+
+Si solo dispone de la carpeta actual, ejecute `python3 pi_mcp.py pi-scan CARPETA_AGENTE --pi-version 1.0.3 --lang es`. El código 2 significa entonces que un servidor **podría** no leerse por la ubicación del archivo; hace falta una captura anterior para confirmar la pérdida.
+
+Cada carpeta contiene los archivos disponibles `settings.json`, `mcp.json`, `mcp-adapter.json` y, si existe, `npm/node_modules/pi-mcp-adapter/`. La comprobación lee JSON o JSONC, muestra solo los **nombres** de servidores y no modifica ni imprime comandos, URL, cabeceras o secretos. Códigos de salida: 0 sin pérdida confirmada, 2 servidores ausentes de la ruta nativa esperada, 3 lector desconocido, 1 captura no válida. Para Pi 0.99+ supone MCP nativo salvo que el adaptador esté declarado en ajustes o presente bajo `extensions/`; una carpeta npm antigua por sí sola no prueba que se cargue. Un adaptador cargado o una versión antigua quedan inconclusos porque las versiones difieren. Esto comprueba la ubicación de archivos, no la visibilidad real de herramientas; use `doctor.py compare` con catálogos capturados para ese otro límite.
+
+**Proyectos relacionados:** [Magpie #1097](https://github.com/yetone/magpie/issues/1097) describe esta migración y la detección de un adaptador obsoleto confirmada por el mantenedor; [el MCP nativo de Pi](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/mcp.md) aporta el lector. Esta herramienta es independiente y no modifica ninguno de los proyectos.
+
 **¿Tu servidor MCP está conectado, pero el agente no ve sus herramientas?** Compara los catálogos para encontrar el primer límite donde desaparecen. Un segundo comando comprueba si una gateway conservó las llamadas y los mensajes de tarea.
 
 [Français](README.fr.md) · [English](README.md) · Español
