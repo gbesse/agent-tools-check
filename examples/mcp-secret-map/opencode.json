@@ -1,0 +1,1 @@
+{"mcp":{"docs":{"type":"remote","url":"https://example.test/mcp","headers":{"Authorization":"Bearer fixture-value-not-a-token"}}}}

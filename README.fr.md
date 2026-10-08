@@ -1,5 +1,17 @@
 # Agent Tools Check
 
+## Nouveau : retrouver les tokens MCP copiés dans les configurations d’agents
+
+`python3 mcp_secret_map.py demo --lang fr` montre **une valeur fictive** copiée dans la bibliothèque Magpie et trois configurations d’agents. La démo réussie sort avec le code 0. Examinez les fichiers que vous contrôlez sans les modifier :
+
+```sh
+python3 mcp_secret_map.py scan --magpie library.json --codex config.toml --claude claude.json --opencode opencode.json --lang fr
+```
+
+Le contrôle lit le tableau `mcp` de Magpie, le TOML `mcp_servers` de Codex, `mcpServers` de Claude et `mcp` d’OpenCode. Il examine seulement les en-têtes d’authentification MCP distants. Le rapport donne des comptes et positions de serveurs ; **ni le texte ni le JSON ne contiennent de valeur, d’URL ou d’empreinte**. Codes de sortie : 0 aucune valeur littérale dans les entrées MCP fournies, 2 valeur littérale possible, 1 entrée invalide. Une valeur peut être fictive ; un résultat vide ne vérifie ni les autres fichiers ni l’agent actif. Les références d’environnement comme `bearer_token_env_var` de Codex, `${VAR}` de Claude et `{env:VAR}` d’OpenCode sont reconnues mais non réécrites ; leur prise en charge par Magpie dépend de sa version.
+
+**Projets voisins :** [Magpie #1250](https://github.com/yetone/magpie/issues/1250) rapporte un token recopié dans les réglages générés et demande des variables d’environnement. [cc-switch](https://github.com/farion1231/cc-switch) est cité dans cette demande comme gestionnaire voisin. Ce contrôle est indépendant, sans intégration ni affiliation avec ces projets.
+
 ## Nouveau : retrouver les serveurs MCP égarés après une synchronisation Pi
 
 `python3 pi_mcp.py pi-demo --lang fr` montre deux serveurs déplacés du `mcp.json` natif de Pi vers un fichier d’adaptateur que la configuration active ne lit pas. La démo réussie sort avec le code 0. Comparez des **copies** avant et après synchronisation :

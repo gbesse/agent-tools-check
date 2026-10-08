@@ -1,5 +1,17 @@
 # Agent Tools Check
 
+## New: find MCP tokens copied into agent configurations
+
+`python3 mcp_secret_map.py demo --lang en` shows one **synthetic** authentication value copied into a Magpie library and three agent configurations. A successful demo exits 0. Inspect files you control without changing them:
+
+```sh
+python3 mcp_secret_map.py scan --magpie library.json --codex config.toml --claude claude.json --opencode opencode.json --lang en
+```
+
+The checker reads Magpie's `mcp` array, Codex `mcp_servers` TOML, Claude `mcpServers` and OpenCode `mcp`. It checks remote MCP authentication headers only. The report gives counts and server positions; **neither text nor JSON output contains a value, URL or fingerprint**. Exit codes: 0 no literal found in supplied MCP entries, 2 possible literal found, 1 invalid input. A literal can be a test value; a clean result does not scan other files or prove a running agent is safe. Environment references such as Codex `bearer_token_env_var`, Claude `${VAR}` and OpenCode `{env:VAR}` are recognized but not rewritten; Magpie support depends on its version.
+
+**Related projects:** [Magpie #1250](https://github.com/yetone/magpie/issues/1250) reports a token copied into generated agent settings and requests variable references. [cc-switch](https://github.com/farion1231/cc-switch) is cited there as a neighboring configuration manager. This checker is independent and has no integration or affiliation with either project.
+
 ## New: find MCP servers stranded after a Pi sync
 
 `python3 pi_mcp.py pi-demo --lang en` shows two servers moving from Pi's native `mcp.json` into an adapter file that the active Pi setup does not read. A successful demo exits 0. Compare **copies** of your configuration before and after a sync:

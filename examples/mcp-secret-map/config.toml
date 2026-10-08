@@ -1,0 +1,4 @@
+[mcp_servers.docs]
+url = "https://example.test/mcp"
+[mcp_servers.docs.http_headers]
+Authorization = "Bearer fixture-value-not-a-token"
