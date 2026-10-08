@@ -1,5 +1,17 @@
 # Agent Tools Check
 
+## Nuevo: localizar tokens MCP copiados en configuraciones de agentes
+
+`python3 mcp_secret_map.py demo --lang es` muestra **un valor ficticio** copiado en la biblioteca Magpie y tres configuraciones de agentes. La demo correcta sale con código 0. Examine los archivos que controle sin modificarlos:
+
+```sh
+python3 mcp_secret_map.py scan --magpie library.json --codex config.toml --claude claude.json --opencode opencode.json --lang es
+```
+
+La comprobación lee la lista `mcp` de Magpie, el TOML `mcp_servers` de Codex, `mcpServers` de Claude y `mcp` de OpenCode. Solo examina las cabeceras de autenticación MCP remotas. El informe da recuentos y posiciones de servidores; **ni la salida de texto ni la de JSON contiene valores, URL o huellas**. Códigos de salida: 0 sin valor literal en las entradas MCP aportadas, 2 posible valor literal, 1 entrada no válida. Un valor puede ser de prueba; un resultado limpio no verifica otros archivos ni un agente activo. Se reconocen referencias de entorno como `bearer_token_env_var` de Codex, `${VAR}` de Claude y `{env:VAR}` de OpenCode, pero no se reescriben; su compatibilidad con Magpie depende de la versión.
+
+**Proyectos relacionados:** [Magpie #1250](https://github.com/yetone/magpie/issues/1250) informa de un token copiado en ajustes generados y solicita referencias a variables de entorno. [cc-switch](https://github.com/farion1231/cc-switch) aparece allí como gestor de configuración cercano. Esta comprobación es independiente, sin integración ni afiliación con ambos proyectos.
+
 ## Nuevo: encontrar servidores MCP extraviados tras sincronizar Pi
 
 `python3 pi_mcp.py pi-demo --lang es` muestra dos servidores trasladados del `mcp.json` nativo de Pi a un archivo del adaptador que la configuración activa no lee. La demo correcta sale con código 0. Compare **copias** anteriores y posteriores a la sincronización:

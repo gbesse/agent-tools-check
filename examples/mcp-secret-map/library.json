@@ -1,0 +1,1 @@
+{"mcp":[{"name":"docs","transport":"http","url":"https://example.test/mcp","headers":{"Authorization":"Bearer fixture-value-not-a-token"},"agents":["codex","claude","opencode"]}]}
