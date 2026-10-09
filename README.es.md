@@ -1,5 +1,11 @@
 # Agent Tools Check
 
+## Nuevo: control de longitud de nombres de herramientas MCP
+
+**« Mi servidor MCP se conecta, pero el agente rechaza un nombre de herramienta largo. »** `python3 tool_name_budget.py demo --lang es` muestra un nombre sintético de 71 caracteres que supera el límite de 64. Compruebe una respuesta `tools/list` guardada o un arreglo `tools` con `python3 tool_name_budget.py check --catalog tools.json --limit 64 --lang es`. El informe muestra nombres, longitudes en caracteres y bytes UTF-8, y posiciones. Nunca cambia los nombres; la pasarela y el cliente deben aplicar los alias de forma coherente. Revise los catálogos antes de compartir sus nombres.
+
+**Proyectos relacionados:** [Magpie #1393](https://github.com/yetone/magpie/issues/1393) describe el rechazo de un nombre MCP largo por Kiro y los alias bidireccionales; [Magpie](https://github.com/yetone/magpie) es un enrutador de configuración vecino. Este control sin conexión es independiente, sin integración ni afiliación con Magpie o Kiro.
+
 ## Nuevo: localizar tokens MCP copiados en configuraciones de agentes
 
 `python3 mcp_secret_map.py demo --lang es` muestra **un valor ficticio** copiado en la biblioteca Magpie y tres configuraciones de agentes. La demo correcta sale con código 0. Examine los archivos que controle sin modificarlos:

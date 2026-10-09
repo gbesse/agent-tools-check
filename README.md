@@ -1,5 +1,11 @@
 # Agent Tools Check
 
+## New: MCP tool name length preflight
+
+**“My MCP server connects, but an agent rejects a long tool name.”** `python3 tool_name_budget.py demo --lang en` shows a synthetic 71-character name over a 64-character limit. Check a saved `tools/list` response or a `tools` array with `python3 tool_name_budget.py check --catalog tools.json --limit 64 --lang en`. Output gives names, character counts, UTF-8 byte counts and positions. It never renames tools; aliases must be applied consistently by the gateway and client. Review catalogs before sharing their names.
+
+**Related projects:** [Magpie #1393](https://github.com/yetone/magpie/issues/1393) reports Kiro rejecting a long MCP name and discusses bidirectional aliases; [Magpie](https://github.com/yetone/magpie) is a neighboring configuration router. This is an independent offline preflight, with no Magpie or Kiro integration or affiliation.
+
 ## New: find MCP tokens copied into agent configurations
 
 `python3 mcp_secret_map.py demo --lang en` shows one **synthetic** authentication value copied into a Magpie library and three agent configurations. A successful demo exits 0. Inspect files you control without changing them:
